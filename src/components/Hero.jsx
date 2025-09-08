@@ -6,9 +6,9 @@ import { useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 
 const Hero = () => {
-
+     const videoRef = useRef();
+    const isMobile = useMediaQuery({ maxWidth: 767 });
     // Animation here
-
     useGSAP(() => {
         const heroSplit = new SplitText(".title", {
             type: "chars, words",
@@ -37,25 +37,38 @@ const Hero = () => {
         });
 
         gsap.timeline({
-                scrollTrigger: {
-                    trigger: "#hero",
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: true,
-                },
-            })
+            scrollTrigger: {
+                trigger: "#hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true,
+            },
+        })
             .to(".right-leaf", { y: 200 }, 0)
             .to(".left-leaf", { y: -200 }, 0)
-            // .to(".arrow", { y: 100 }, 0);
+            .to(".arrow", { y: 100 }, 0);
 
+        const startValue = isMobile ? "top 50%" : "center 60%";
+        const endValue = isMobile ? "120% top" : "bottom top";
 
-    }, [])
+        let tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: "video",
+                start: startValue,
+                end: endValue,
+                scrub: true,
+                pin: true,
+            },
+        });
 
+        videoRef.current.onloadedmetadata = () => {
+            tl.to(videoRef.current, {
+                currentTime: videoRef.current.duration,
+            });
+        };
 
-
-
-
-    const videoRef = useRef();
+    }, []);
+    
 
     return (
         <>
@@ -65,6 +78,8 @@ const Hero = () => {
                 <img src="/images/hero-right-leaf.png" alt="" className='right-leaf' />
 
                 <div className="body">
+                    <img src="/images/arrow.png" alt="arrow" className="arrow" />
+
                     <div className="content">
                         <div className="space-y-5 hidden md:block">
                             <p>Cool Crips. Classic</p>
